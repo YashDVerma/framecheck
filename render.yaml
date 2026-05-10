@@ -16,6 +16,4 @@ services:
       - key: PYTHON_VERSION
         value: "3.10.12"
       - key: LLM_BACKEND
-        value: anthropic
-      - key: ANTHROPIC_API_KEY
-        sync: false   # set this manually in the Render dashboard — never commit secrets
+        value: none
