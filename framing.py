@@ -1,36 +1,39 @@
 import spacy
 
-_nlp = None
+_nlp = None  # False = model unavailable; None = not yet attempted
 
 
 def _get_nlp():
     global _nlp
     if _nlp is None:
         try:
-            import en_core_web_sm
-            _nlp = en_core_web_sm.load()
-        except ImportError:
-            _nlp = spacy.load("en_core_web_sm")
+            try:
+                import en_core_web_sm
+                _nlp = en_core_web_sm.load()
+            except ImportError:
+                _nlp = spacy.load("en_core_web_sm")
+        except OSError:
+            _nlp = False  # model not installed — degrade gracefully
     return _nlp
 
 
 def load_model() -> None:
-    """Eagerly load the SpaCy model (call from lifespan to avoid cold-start lag)."""
     _get_nlp()
 
 
 def analyze_framing(text: str) -> dict:
-    doc = _get_nlp()(text)
+    nlp = _get_nlp()
+    if not nlp:
+        return {"entity_counts": {}, "modal_count": 0, "passive_ratio": 0.0, "sentence_count": 0}
 
-    # Named-entity counts by type (PERSON, ORG, GPE, …)
+    doc = nlp(text)
+
     entity_counts: dict[str, int] = {}
     for ent in doc.ents:
         entity_counts[ent.label_] = entity_counts.get(ent.label_, 0) + 1
 
-    # Modal verbs: tag MD covers can/could/may/might/must/shall/should/will/would
     modal_count = sum(1 for tok in doc if tok.tag_ == "MD")
 
-    # Passive voice: sentences that contain a passive nominal subject
     sentences = list(doc.sents)
     sentence_count = len(sentences)
     passive_sentences = sum(
