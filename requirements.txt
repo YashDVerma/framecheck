@@ -1,0 +1,18 @@
+# FrameCheck dependencies.
+# New packages are added each day so install times stay short while scaffolding.
+
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+pydantic==2.9.2
+
+# Day 2 — Hugging Face sentiment
+transformers==4.47.0
+torch==2.5.1
+
+# Day 3 — SpaCy framing signals
+# After pip install, also run: python -m spacy download en_core_web_sm
+spacy>=3.7,<4.0
+
+# Day 4 — LLM frame summary
+anthropic>=0.40.0
+requests>=2.31.0   # used directly in llm.py for Ollama calls

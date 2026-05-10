@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: framecheck
+    runtime: python
+    plan: free
+
+    # Pre-download both models at build time so cold-start wake-ups are fast.
+    buildCommand: >
+      pip install -r requirements.txt &&
+      python -m spacy download en_core_web_sm &&
+      python -c "from transformers import pipeline; pipeline('sentiment-analysis', model='distilbert-base-uncased-finetuned-sst-2-english', truncation=True)"
+
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.10.12"
+      - key: LLM_BACKEND
+        value: anthropic
+      - key: ANTHROPIC_API_KEY
+        sync: false   # set this manually in the Render dashboard — never commit secrets

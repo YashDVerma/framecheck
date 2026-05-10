@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Distribution / build
+build/
+dist/
+*.egg-info/
+*.egg
+pip-wheel-metadata/
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+
+# IDE / editors
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Environment / secrets
+.env
+.env.local
+*.local
+
+# Hugging Face / model caches (these get LARGE — never commit)
+.cache/
+models/
+*.bin
+*.pt
+*.safetensors
+
+# SpaCy cached models
+*.spacy
+
+# Logs
+*.log
+logs/
+
+# OS
+Thumbs.db
