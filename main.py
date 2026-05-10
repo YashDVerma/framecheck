@@ -1,13 +1,10 @@
 """
 FrameCheck — a small FastAPI service for analyzing news framing.
 
-Roadmap:
-  Day 1: scaffold + echo /analyze endpoint.
-  Day 2: + Hugging Face sentiment (distilbert-base-uncased-finetuned-sst-2-english).
-  Day 3: + SpaCy framing signals (NER, modals, passive voice).
-  Day 4: + LLM frame summary (Ollama / Anthropic).
-  Day 5: + HTML demo page at GET /demo.
-  Deploy: switched sentiment to VADER (NLTK) — 3-class output, fits Render free tier.
+Pipeline:
+  - Sentiment:       VADER (NLTK) — POSITIVE / NEGATIVE / NEUTRAL
+  - Framing signals: SpaCy en_core_web_sm — NER counts, modal verbs, passive-voice ratio
+  - Frame summary:   Anthropic Claude (LLM_BACKEND=anthropic) or Ollama (LLM_BACKEND=ollama)
 """
 
 from contextlib import asynccontextmanager
