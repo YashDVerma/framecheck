@@ -1,0 +1,8 @@
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+pydantic==2.9.2
+transformers>=4.47.0
+# torch is installed as CPU-only before this file — see buildCommand in render.yaml
+spacy>=3.7,<4.0
+anthropic>=0.40.0
+requests>=2.31.0

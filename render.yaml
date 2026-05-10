@@ -4,9 +4,11 @@ services:
     runtime: python
     plan: free
 
-    # Pre-download both models at build time so cold-start wake-ups are fast.
+    # CPU-only torch is ~200MB vs ~2GB for CUDA — essential for Render's 512MB free tier.
+    # Install it first so transformers reuses it rather than pulling CUDA torch as a dep.
     buildCommand: >
-      pip install -r requirements.txt &&
+      pip install torch --index-url https://download.pytorch.org/whl/cpu &&
+      pip install -r requirements-render.txt &&
       python -m spacy download en_core_web_sm &&
       python -c "from transformers import pipeline; pipeline('sentiment-analysis', model='distilbert-base-uncased-finetuned-sst-2-english', truncation=True)"
 
