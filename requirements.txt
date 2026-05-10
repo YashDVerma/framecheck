@@ -5,7 +5,8 @@ fastapi==0.115.0
 uvicorn[standard]==0.32.0
 pydantic==2.9.2
 
-# Day 2 — Hugging Face sentiment
+# Day 2 — sentiment (VADER for deploy; HF transformers kept for local experimentation)
+nltk>=3.8
 transformers>=4.47.0
 torch>=2.5.0
 

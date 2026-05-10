@@ -4,13 +4,11 @@ services:
     runtime: python
     plan: free
 
-    # CPU-only torch is ~200MB vs ~2GB for CUDA — essential for Render's 512MB free tier.
-    # Install it first so transformers reuses it rather than pulling CUDA torch as a dep.
+    # No torch on Render — VADER (NLTK) handles sentiment with ~2MB vs ~260MB for DistilBERT.
     buildCommand: >
-      pip install torch --index-url https://download.pytorch.org/whl/cpu &&
       pip install -r requirements-render.txt &&
       python -m spacy download en_core_web_sm &&
-      python -c "from transformers import pipeline; pipeline('sentiment-analysis', model='distilbert-base-uncased-finetuned-sst-2-english', truncation=True)"
+      python -c "import nltk; nltk.download('vader_lexicon', quiet=True)"
 
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
 

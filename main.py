@@ -6,6 +6,8 @@ Roadmap:
   Day 2: + Hugging Face sentiment (distilbert-base-uncased-finetuned-sst-2-english).
   Day 3: + SpaCy framing signals (NER, modals, passive voice).
   Day 4: + LLM frame summary (Ollama / Anthropic).
+  Day 5: + HTML demo page at GET /demo.
+  Deploy: switched sentiment to VADER (NLTK) — 3-class output, fits Render free tier.
 """
 
 from contextlib import asynccontextmanager
@@ -15,22 +17,15 @@ from typing import Optional
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
-from transformers import pipeline as hf_pipeline
 
 import framing as framing_module
 import llm as llm_module
-
-_sentiment_pipe = None
+import sentiment as sentiment_module
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global _sentiment_pipe
-    _sentiment_pipe = hf_pipeline(
-        "sentiment-analysis",
-        model="distilbert-base-uncased-finetuned-sst-2-english",
-        truncation=True,   # silently truncates inputs longer than 512 tokens
-    )
+    sentiment_module.load_model()
     framing_module.load_model()
     yield
 
@@ -41,7 +36,7 @@ app = FastAPI(
         "Analyzes news headlines and articles for sentiment, linguistic "
         "framing signals, and potential bias indicators."
     ),
-    version="0.5.0",
+    version="0.6.0",
     lifespan=lifespan,
 )
 
@@ -57,8 +52,8 @@ class AnalyzeRequest(BaseModel):
 
 
 class SentimentResult(BaseModel):
-    label: str = Field(description="POSITIVE or NEGATIVE")
-    score: float = Field(description="Model confidence, 0–1")
+    label: str = Field(description="POSITIVE, NEGATIVE, or NEUTRAL")
+    score: float = Field(description="Absolute VADER compound score, 0–1")
 
 
 class FramingSignals(BaseModel):
@@ -89,7 +84,7 @@ class AnalyzeResponse(BaseModel):
 @app.get("/")
 def root():
     """Liveness check."""
-    return {"status": "ok", "service": "FrameCheck", "version": "0.5.0"}
+    return {"status": "ok", "service": "FrameCheck", "version": "0.6.0"}
 
 
 @app.get("/demo", response_class=HTMLResponse)
@@ -101,16 +96,16 @@ def demo():
 @app.post("/analyze", response_model=AnalyzeResponse)
 def analyze(req: AnalyzeRequest):
     """
-    Returns text stats, sentiment, SpaCy framing signals, and an LLM frame summary.
+    Returns text stats, sentiment (VADER), SpaCy framing signals, and an LLM frame summary.
     """
-    result = _sentiment_pipe(req.text)[0]
+    sent = sentiment_module.analyze_sentiment(req.text)
     signals = framing_module.analyze_framing(req.text)
     summary = llm_module.frame_summary(req.text)
     return AnalyzeResponse(
         received_text=req.text,
         char_count=len(req.text),
         word_count=len(req.text.split()),
-        sentiment=SentimentResult(label=result["label"], score=result["score"]),
+        sentiment=SentimentResult(**sent),
         framing=FramingSignals(**signals),
         frame_summary=FrameSummary(**summary) if summary else None,
     )
