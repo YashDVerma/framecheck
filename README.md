@@ -12,7 +12,7 @@ Send a headline or article body to `POST /analyze`; get back:
 
 ## Status
 
-**Day 6 of 7 — deployed.** Live demo: **https://framecheck.onrender.com/demo**
+**Day 6 of 7 — deployed.** Live demo: **https://framecheck-40up.onrender.com/demo**
 
 > Free-tier note: the service sleeps after 15 minutes of inactivity. First request after sleep takes ~30 s to wake up; subsequent requests are fast. Both ML models are pre-downloaded at build time so there is no extra model-load delay on wake-up.
 
