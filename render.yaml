@@ -5,9 +5,9 @@ services:
     plan: free
 
     # No torch on Render — VADER (NLTK) handles sentiment with ~2MB vs ~260MB for DistilBERT.
+    # en_core_web_sm is installed directly via pip URL in requirements-render.txt.
     buildCommand: >
       pip install -r requirements-render.txt &&
-      python -m spacy download en_core_web_sm &&
       python -c "import nltk; nltk.download('vader_lexicon', quiet=True)"
 
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
