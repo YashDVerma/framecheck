@@ -6,7 +6,11 @@ _nlp = None
 def _get_nlp():
     global _nlp
     if _nlp is None:
-        _nlp = spacy.load("en_core_web_sm")
+        try:
+            import en_core_web_sm
+            _nlp = en_core_web_sm.load()
+        except ImportError:
+            _nlp = spacy.load("en_core_web_sm")
     return _nlp
 
 
