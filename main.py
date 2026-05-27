@@ -55,9 +55,11 @@ class SentimentResult(BaseModel):
 
 class FramingSignals(BaseModel):
     entity_counts: dict[str, int] = Field(description="Named-entity counts by type (PERSON, ORG, GPE, …)")
-    modal_count: int = Field(description="Number of modal verbs (can/could/may/might/must/shall/should/will/would)")
-    passive_ratio: float = Field(description="Fraction of sentences using passive voice, 0–1")
+    modal_count: int = Field(description="Number of modal verbs (can/could/may/might/must/shall/should/will/would)")   
+    agentfull_passive_ratio: float = Field(description="Fraction of sentences using agent-full passive voice, 0–1")
+    agentless_passive_ratio: float = Field(description="Fraction of sentences using agent-less passive voice, 0–1")
     sentence_count: int = Field(description="Total sentence count")
+    average_sentence_length: float = Field(description="Average sentence length in tokens, to check for complexity")
 
 
 class FrameSummary(BaseModel):

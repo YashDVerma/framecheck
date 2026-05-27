@@ -24,7 +24,7 @@ def load_model() -> None:
 def analyze_framing(text: str) -> dict:
     nlp = _get_nlp()
     if not nlp:
-        return {"entity_counts": {}, "modal_count": 0, "passive_ratio": 0.0, "sentence_count": 0}
+        return {"entity_counts": {}, "modal_count": 0, "agentless_passive_ratio": 0.0, "agentfull_passive_ratio": 0.0, "sentence_count": 0, "average_sentence_length": 0.0}
 
     doc = nlp(text)
 
@@ -36,15 +36,30 @@ def analyze_framing(text: str) -> dict:
 
     sentences = list(doc.sents)
     sentence_count = len(sentences)
-    passive_sentences = sum(
+    total_tokens = sum(1 for tok in doc if not tok.is_punct and not tok.is_space)
+    average_sentence_length = round(total_tokens / sentence_count, 3) if sentence_count else 0.0
+    
+    agentless_passive_sentences = sum(
         1 for sent in sentences
         if any(tok.dep_ in ("nsubjpass", "csubjpass") for tok in sent)
+        and not any(tok.dep_ == "agent" for tok in sent)
     )
-    passive_ratio = round(passive_sentences / sentence_count, 3) if sentence_count else 0.0
+    
+    agentfull_passive_sentences =sum(
+        1 for sent in sentences
+        if any(tok.dep_ in ("nsubjpass", "csubjpass") for tok in sent)
+        and any(tok.dep_ == "agent" for tok in sent)
+    )
+    
+    agentless_passive_ratio = round(agentless_passive_sentences / sentence_count, 3) if sentence_count else 0.0
+    agentfull_passive_ratio = round(agentfull_passive_sentences / sentence_count, 3) if sentence_count else 0.0
+    
 
     return {
         "entity_counts": entity_counts,
         "modal_count": modal_count,
-        "passive_ratio": passive_ratio,
+        "agentless_passive_ratio": agentless_passive_ratio,
+        "agentfull_passive_ratio": agentfull_passive_ratio,
         "sentence_count": sentence_count,
+        "average_sentence_length": average_sentence_length,
     }
